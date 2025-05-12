@@ -1,0 +1,12 @@
+/* Estilo propio para este módulo */
+body {
+    background-color: #000;
+    color: #fff;
+}
+#universe {
+    margin: 20px auto;
+    width: 80%;
+    height: 400px;
+    background-color: #111;
+    border: 1px solid #444;
+}
