@@ -1,0 +1,9 @@
+/* Estilo de este módulo */
+body {
+    background-color: #222;
+    color: #ddd;
+}
+input[type="file"] {
+    display: block;
+    margin: 20px auto;
+}
