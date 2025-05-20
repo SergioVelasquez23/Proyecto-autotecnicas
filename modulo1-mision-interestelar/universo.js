@@ -1,8 +1,8 @@
 // universo.js
 console.log("Universo cargado.");
 
-let universoDatos = null;     // Aquí se guardan todos los datos del JSON
-let matrizEnergia = null;     // Matriz con valores del 1 al 10 (gasto por celda)
+let universoDatos = null; // Aquí se guardan todos los datos del JSON
+let matrizEnergia = null; // Matriz con valores del 1 al 10 (gasto por celda)
 
 /**
  * Carga un archivo .json desde input file
@@ -33,7 +33,8 @@ document.getElementById("btn-cargar").addEventListener("click", () => {
       document.getElementById("btn-iniciar").disabled = false;
 
       log("✅ Universo cargado correctamente.");
-      document.getElementById("energia-nave").textContent = universoDatos.cargaInicial;
+      document.getElementById("energia-nave").textContent =
+        universoDatos.cargaInicial;
     } catch (err) {
       alert("Error al leer el JSON. Asegúrate de que el formato sea válido.");
       console.error(err);

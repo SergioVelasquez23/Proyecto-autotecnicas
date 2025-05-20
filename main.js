@@ -10,4 +10,3 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "modulo2-sintaxis-galactica/index.html";
   });
 });
-    

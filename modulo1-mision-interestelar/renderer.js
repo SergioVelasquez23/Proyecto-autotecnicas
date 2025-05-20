@@ -43,7 +43,12 @@ function dibujarRuta(ruta, color = "yellow") {
   ruta.forEach(([x, y], i) => {
     setTimeout(() => {
       ctx.fillStyle = color;
-      ctx.fillRect(x * tamCelda + 5, y * tamCelda + 5, tamCelda - 10, tamCelda - 10);
+      ctx.fillRect(
+        x * tamCelda + 5,
+        y * tamCelda + 5,
+        tamCelda - 10,
+        tamCelda - 10
+      );
     }, i * 150);
   });
 }
@@ -73,8 +78,16 @@ function simularMovimientoNave(ruta) {
     ctx.font = `${tamCelda - 5}px Arial`; // Ajusta el tamaño de la fuente al tamaño de la celda
     ctx.textAlign = "center"; // Centra el emoji horizontalmente
     ctx.textBaseline = "middle"; // Centra el emoji verticalmente
-    console.log(`Dibujando emoji en (${x * tamCelda + tamCelda / 2}, ${y * tamCelda + tamCelda / 2})`);
-    ctx.fillText("⭐", x * tamCelda + tamCelda / 2, y * tamCelda + tamCelda / 2);
+    console.log(
+      `Dibujando emoji en (${x * tamCelda + tamCelda / 2}, ${
+        y * tamCelda + tamCelda / 2
+      })`
+    );
+    ctx.fillText(
+      "⭐",
+      x * tamCelda + tamCelda / 2,
+      y * tamCelda + tamCelda / 2
+    );
 
     i++;
   }, 250);
@@ -98,8 +111,10 @@ function dibujarCohete(x, y) {
  */
 function detectarTipoCelda(x, y, universo) {
   const match = (list, key = "") =>
-    list.some(item => 
-      Array.isArray(item) ? item[0] === y && item[1] === x : item[key][0] === y && item[key][1] === x
+    list.some((item) =>
+      Array.isArray(item)
+        ? item[0] === y && item[1] === x
+        : item[key][0] === y && item[key][1] === x
     );
 
   if (match(universo.agujerosNegros)) return "agujeroNegro";
@@ -118,14 +133,22 @@ function detectarTipoCelda(x, y, universo) {
  */
 function obtenerColorPorTipo(tipo, valor) {
   switch (tipo) {
-    case "agujeroNegro": return "#000";
-    case "estrella": return "#f1c40f";
-    case "portal": return "#9b59b6";
-    case "gusano": return "#1abc9c";
-    case "recarga": return "#2ecc71";
-    case "cargaExtra": return "#e67e22";
-    case "origen": return "#3498db";
-    case "destino": return "#e74c3c";
+    case "agujeroNegro":
+      return "#000";
+    case "estrella":
+      return "#f1c40f";
+    case "portal":
+      return "#9b59b6";
+    case "gusano":
+      return "#1abc9c";
+    case "recarga":
+      return "#2ecc71";
+    case "cargaExtra":
+      return "#e67e22";
+    case "origen":
+      return "#3498db";
+    case "destino":
+      return "#e74c3c";
     default:
       return `rgba(255,255,255,${valor / 10})`; // normal con opacidad según gasto
   }

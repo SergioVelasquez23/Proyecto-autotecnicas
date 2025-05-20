@@ -1,5 +1,5 @@
 // Lógica del algoritmo de backtracking
-console.log("Backtracking cargado.");   
+console.log("Backtracking cargado.");
 
 let rutaFinal = []; // Ruta final encontrada
 let energia = 0;
@@ -14,7 +14,10 @@ document.getElementById("btn-iniciar").addEventListener("click", () => {
   if (!universoDatos || !matrizEnergia) return;
 
   energia = universoDatos.cargaInicial;
-  visitados = crearMatrizBooleana(universoDatos.matriz.filas, universoDatos.matriz.columnas);
+  visitados = crearMatrizBooleana(
+    universoDatos.matriz.filas,
+    universoDatos.matriz.columnas
+  );
   rutaFinal = [];
 
   const [origenY, origenX] = universoDatos.origen;
@@ -24,8 +27,6 @@ document.getElementById("btn-iniciar").addEventListener("click", () => {
     log("🚀 ¡Ruta encontrada!");
     document.getElementById("btn-siguiente").disabled = false;
     simularMovimientoNave(rutaFinal);
-
-
   } else {
     log("❌ No se encontró ninguna ruta válida.");
   }
@@ -36,7 +37,13 @@ document.getElementById("btn-iniciar").addEventListener("click", () => {
  */
 function buscarCamino(x, y, energiaActual, ruta) {
   // Limites de la matriz
-  if (x < 0 || y < 0 || y >= matrizEnergia.length || x >= matrizEnergia[0].length) return false;
+  if (
+    x < 0 ||
+    y < 0 ||
+    y >= matrizEnergia.length ||
+    x >= matrizEnergia[0].length
+  )
+    return false;
   if (visitados[y][x]) return false;
 
   // Verificar si es agujero negro
@@ -71,9 +78,9 @@ function buscarCamino(x, y, energiaActual, ruta) {
   // Posibles movimientos (arriba, abajo, izq, der)
   const dirs = [
     [0, -1], // arriba
-    [0, 1],  // abajo
+    [0, 1], // abajo
     [-1, 0], // izquierda
-    [1, 0]   // derecha
+    [1, 0], // derecha
   ];
 
   for (let [dx, dy] of dirs) {
@@ -83,13 +90,23 @@ function buscarCamino(x, y, energiaActual, ruta) {
   // Usar agujero de gusano
   const destinoGusano = usarGusano(x, y);
   if (destinoGusano) {
-    if (buscarCamino(destinoGusano[0], destinoGusano[1], energiaRestante, [...ruta])) return true;
+    if (
+      buscarCamino(destinoGusano[0], destinoGusano[1], energiaRestante, [
+        ...ruta,
+      ])
+    )
+      return true;
   }
 
   // Usar portal
   const destinoPortal = usarPortal(x, y);
   if (destinoPortal) {
-    if (buscarCamino(destinoPortal[0], destinoPortal[1], energiaRestante, [...ruta])) return true;
+    if (
+      buscarCamino(destinoPortal[0], destinoPortal[1], energiaRestante, [
+        ...ruta,
+      ])
+    )
+      return true;
   }
 
   return false;
@@ -106,17 +123,23 @@ function esAgujeroNegro(x, y) {
 }
 
 function energiaExtra(x, y) {
-  const celda = universoDatos.celdasCargaRequerida.find(c => c.coordenada[0] === y && c.coordenada[1] === x);
+  const celda = universoDatos.celdasCargaRequerida.find(
+    (c) => c.coordenada[0] === y && c.coordenada[1] === x
+  );
   return celda ? celda.cargaGastada : 0;
 }
 
 function obtenerRecarga(x, y) {
-  const zona = universoDatos.zonasRecarga.find(([zy, zx]) => zy === y && zx === x);
+  const zona = universoDatos.zonasRecarga.find(
+    ([zy, zx]) => zy === y && zx === x
+  );
   return zona ? zona[2] : 0;
 }
 
 function usarGusano(x, y) {
-  const gusano = universoDatos.agujerosGusano.find(g => g.entrada[0] === y && g.entrada[1] === x);
+  const gusano = universoDatos.agujerosGusano.find(
+    (g) => g.entrada[0] === y && g.entrada[1] === x
+  );
   if (gusano) {
     const key = `${x},${y}`;
     if (!usadoGusano.has(key)) {
@@ -128,7 +151,9 @@ function usarGusano(x, y) {
 }
 
 function usarPortal(x, y) {
-  const portal = universoDatos.portales.find(p => p.desde[0] === y && p.desde[1] === x);
+  const portal = universoDatos.portales.find(
+    (p) => p.desde[0] === y && p.desde[1] === x
+  );
   if (portal) {
     const key = `${x},${y}`;
     if (!usadoPortal.has(key)) {
