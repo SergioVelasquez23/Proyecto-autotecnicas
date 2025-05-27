@@ -10,10 +10,58 @@
 </head>
 
 <body>
-    <h1>Sintaxis Galáctica</h1>
-    <input type="file" id="fileInput">
+    <header>
+        <h1>Sintaxis Galáctica</h1>
+    </header>
+    <main>
+        <input type="file" id="fileInput">
+        <button id="validateButton">Validar</button>
+        <div id="results"></div>
+    </main>
+    <footer>
+        <p>&copy; 2025 Sintaxis Galáctica. Todos los derechos reservados.</p>
+    </footer>
     <script src="validator.js"></script>
     <script src="afd.js"></script>
+    <script>
+        document.getElementById('validateButton').addEventListener('click', () => {
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput.files.length === 0) {
+                alert('Por favor, selecciona un archivo.');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                const content = event.target.result;
+                const lines = content.split('\n').map(line => line.trim()).filter(line => line !== '');
+                const resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = '';
+
+                lines.forEach((line, index) => {
+                    const resultadoTarjeta = validarTarjetaCredito(line);
+                    const resultadoIPv4 = validarIPv4(line);
+
+                    let resultMessage;
+                    if (resultadoTarjeta.valido) {
+                        resultMessage = `Línea ${index + 1}: Tarjeta válida`;
+                    } else if (resultadoIPv4.valido) {
+                        resultMessage = `Línea ${index + 1}: IPv4 válida`;
+                    } else {
+                        resultMessage = `Línea ${index + 1}: Inválida - ${resultadoTarjeta.error || resultadoIPv4.error}`;
+                    }
+
+                    const resultElement = document.createElement('p');
+                    resultElement.textContent = resultMessage;
+                    resultsDiv.appendChild(resultElement);
+                });
+            };
+
+            reader.readAsText(file);
+        });
+    </script>
 </body>
 
 </html>
