@@ -4,7 +4,7 @@
     "columnas": 40
   },
   "origen": [0, 0],
-  "destino": [0, 11],
+  "destino": [13, 13],
   "agujerosNegros": [
     [3, 5],
     [10, 20],
@@ -54,7 +54,7 @@
       "cargaGastada": 22
     }
   ],
-  "cargaInicial": 200,
+  "cargaInicial": 400,
   "matrizInicial": [
     [
       8, 3, 10, 5, 10, 5, 1, 10, 3, 8, 9, 9, 2, 7, 1, 6, 7, 8, 10, 6, 10, 8, 2,
