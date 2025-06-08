@@ -70,18 +70,86 @@ button:active {
 #results {
     margin: 20px auto;
     padding: 15px;
-    max-width: 600px;
+    max-width: 800px;
     background-color: #141424;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(88, 166, 255, 0.2);
     color: #58a6ff;
     text-align: left;
-    overflow-y: auto;
-    max-height: 300px;
 }
 
-footer {
-    margin: 20px 0;
+#originalContent {
+    background-color: #1a1a2e;
+    border: 1px solid #2c2c45;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#originalContent pre {
+    margin: 0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: #e1e4e8;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.result-item {
+    margin: 10px 0;
+    padding: 12px;
+    border-radius: 8px;
+    border-left: 4px solid;
+    background-color: #1a1a2e;
+}
+
+.result-item.valid {
+    border-left-color: #28a745;
+    background-color: rgba(40, 167, 69, 0.1);
+}
+
+.result-item.invalid {
+    border-left-color: #dc3545;
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.result-type {
+    color: #7c3aed;
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.error-message {
+    color: #ff6b6b;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+.error-position {
+    color: #ffd93d;
     font-size: 0.85rem;
+}
+
+.no-results {
     color: #888;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+}
+
+#validResults, #invalidResults {
+    margin-bottom: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+h2 {
+    color: #58a6ff;
+    border-bottom: 2px solid #2c2c45;
+    padding-bottom: 8px;
+    margin-bottom: 15px;
 }

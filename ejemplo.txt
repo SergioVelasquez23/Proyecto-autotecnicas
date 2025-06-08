@@ -1,10 +1,45 @@
-1234 5678 9012 3456 02/2029 336
-192.168.0.1
+// Ejemplos VÁLIDOS de Tarjetas de Crédito
+123456789012345603/2029336
 1234 5678 9012 3456 05/2025 123
-10.0.0.256
-1234 5678 9012 3456 12/2030 999
-192.168.1.1
+1234 5678 9012 3456 F2/2030 999
+1234 5678 9012 3456 01/2028 111
+1234 5678 9012 3456 07/2027 222
+1234 5678 9012 2456 11/2026 333
+
+// Ejemplos VÁLIDOS de Direcciones IPv4
+192.168.0.1
 10.0.0.1
+192.168.1.1
 172.16.0.1
-255.255.255.275
+255.255.255.255
 0.0.0.0
+192.0.2.146
+198.51.100.23
+203.0.113.5
+
+// Ejemplos INVÁLIDOS de Tarjetas de Crédito
+1234 5678 9012 345 03/2029 336  // Número incompleto
+1234 5678 9012 34567 05/2025 123  // Número demasiado largo
+1234 5678 9012 3456 13/2029 336  // Mes inválido (13)
+1234 5678 9012 3456 00/2025 123  // Mes inválido (00)
+1234 5678 9012 3456 03/2022 999  // Año pasado
+1234 5678 9012 3456 03/2029 99   // CVV incompleto
+1234 5678 9012 3456 03/2029 1234 // CVV demasiado largo
+12345678901234560332029336      // Sin espacios ni separadores
+1234-5678-9012-3456 03/2029 336 // Formato con guiones
+1234a5678b9012c3456 03/2029 336 // Letras mezcladas
+
+// Ejemplos INVÁLIDOS de Direcciones IPv4
+192.168.0.256   // Octeto > 255
+256.168.0.1     // Primer octeto > 255
+192.168.300.1   // Tercer octeto > 255
+192.168.0.-1    // Octeto negativo
+192.168.0       // Incompleto (3 octetos)
+192.168.0.1.5   // Demasiados octetos
+192.168.01.1    // Ceros a la izquierda
+192,168,0,1     // Comas en lugar de puntos
+192.168.0.a     // Letra en lugar de número
+192. 168.0.1    // Espacios
+192..168.0.1    // Doble punto
+.192.168.0.1    // Punto inicial
+192.168.0.1.    // Punto final

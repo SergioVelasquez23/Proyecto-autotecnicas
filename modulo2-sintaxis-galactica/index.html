@@ -1,4 +1,3 @@
-<!-- Interfaz de carga de archivo -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,7 +15,14 @@
     <main>
         <input type="file" id="fileInput">
         <button id="validateButton">Validar</button>
-        <div id="results"></div>
+        <div id="results">
+            <h2>Contenido Original del Archivo</h2>
+            <div id="originalContent"></div>
+            <h2>Cadenas Válidas</h2>
+            <div id="validResults"></div>
+            <h2>Cadenas Inválidas</h2>
+            <div id="invalidResults"></div>
+        </div>
     </main>
     <footer>
         <p>&copy; 2025 Sintaxis Galáctica. Todos los derechos reservados.</p>
@@ -36,27 +42,40 @@
 
             reader.onload = function (event) {
                 const content = event.target.result;
-                const lines = content.split('\n').map(line => line.trim()).filter(line => line !== '');
-                const resultsDiv = document.getElementById('results');
-                resultsDiv.innerHTML = '';
+                const lines = content.split('\n').map(line => line.trim()).filter(line => line !== '' && !line.startsWith('//'));
+                const results = validarArchivo(lines);
 
-                lines.forEach((line, index) => {
-                    const resultadoTarjeta = validarTarjetaCredito(line);
-                    const resultadoIPv4 = validarIPv4(line);
+                // Mostrar contenido original
+                const originalContentDiv = document.getElementById('originalContent');
+                originalContentDiv.innerHTML = `<pre>${content}</pre>`;
 
-                    let resultMessage;
-                    if (resultadoTarjeta.valido) {
-                        resultMessage = `Línea ${index + 1}: Tarjeta válida`;
-                    } else if (resultadoIPv4.valido) {
-                        resultMessage = `Línea ${index + 1}: IPv4 válida`;
-                    } else {
-                        resultMessage = `Línea ${index + 1}: Inválida - ${resultadoTarjeta.error || resultadoIPv4.error}`;
-                    }
+                // Mostrar resultados
+                const validResultsDiv = document.getElementById('validResults');
+                const invalidResultsDiv = document.getElementById('invalidResults');
 
-                    const resultElement = document.createElement('p');
-                    resultElement.textContent = resultMessage;
-                    resultsDiv.appendChild(resultElement);
-                });
+                if (results.validas.length > 0) {
+                    validResultsDiv.innerHTML = results.validas.map(result =>
+                        `<div class="result-item valid">
+                            <strong>✓ ${result.original}</strong><br>
+                            <span class="result-type">${result.tipo}</span>
+                        </div>`
+                    ).join('');
+                } else {
+                    validResultsDiv.innerHTML = '<p class="no-results">No se encontraron cadenas válidas</p>';
+                }
+
+                if (results.invalidas.length > 0) {
+                    invalidResultsDiv.innerHTML = results.invalidas.map(result =>
+                        `<div class="result-item invalid">
+                            <strong>✗ ${result.original}</strong><br>
+                            <span class="result-type">${result.tipo}</span><br>
+                            <span class="error-message">Error: ${result.error}</span>
+                            ${result.errorPosicion !== undefined ? `<br><span class="error-position">Posición del error: ${result.errorPosicion}</span>` : ''}
+                        </div>`
+                    ).join('');
+                } else {
+                    invalidResultsDiv.innerHTML = '<p class="no-results">No se encontraron cadenas inválidas</p>';
+                }
             };
 
             reader.readAsText(file);
