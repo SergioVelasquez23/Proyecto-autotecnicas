@@ -1,12 +1,11 @@
-// renderer.js - Versión completa
-console.log("Renderer completo cargado.");
+console.log("Renderer corregido cargado.");
 
 const canvas = document.getElementById("canvas-universo");
 const ctx = canvas.getContext("2d");
 let tamCelda = 30; 
 
 /**
- * Dibuja la matriz del universo con íconos mejorados
+ * Dibuja la matriz 
  */
 function dibujarMatriz(matriz, universo) {
   const filas = matriz.length;
@@ -39,7 +38,7 @@ function dibujarMatriz(matriz, universo) {
 }
 
 /**
- * Dibuja el ícono correspondiente para cada tipo de celda
+ * Dibuja el ícono 
  */
 function dibujarIcono(ctx, x, y, tipo, valor) {
   const centroX = x * tamCelda + tamCelda / 2;
@@ -51,27 +50,35 @@ function dibujarIcono(ctx, x, y, tipo, valor) {
 
   switch (tipo) {
     case "agujeroNegro":
+      ctx.fillStyle = "#ffffff";
       ctx.fillText("🕳️", centroX, centroY);
       break;
     case "estrella":
+      ctx.fillStyle = "#ffeb3b";
       ctx.fillText("⭐", centroX, centroY);
       break;
     case "portal":
+      ctx.fillStyle = "#9c27b0";
       ctx.fillText("🚪", centroX, centroY);
       break;
     case "gusano":
+      ctx.fillStyle = "#2196f3";
       ctx.fillText("🌀", centroX, centroY);
       break;
     case "recarga":
+      ctx.fillStyle = "#4caf50";
       ctx.fillText("⚡", centroX, centroY);
       break;
     case "cargaExtra":
+      ctx.fillStyle = "#ff9800";
       ctx.fillText("🔋", centroX, centroY);
       break;
     case "origen":
+      ctx.fillStyle = "#00bcd4";
       ctx.fillText("🏠", centroX, centroY);
       break;
     case "destino":
+      ctx.fillStyle = "#f44336";
       ctx.fillText("🎯", centroX, centroY);
       break;
     default:
@@ -94,102 +101,167 @@ function dibujarIcono(ctx, x, y, tipo, valor) {
 }
 
 /**
- * Simula el movimiento de la nave paso a paso 
+ * Simula el movimiento de la nave 
  */
 function simularMovimientoNave(ruta) {
-  console.log("Iniciando simulación de movimiento de la nave", ruta);
-  let i = 0;
+  console.log("🚀 Iniciando simulación de movimiento de la nave", ruta);
+  
+  // Validar que la ruta existe y tiene contenido
+  if (!ruta || ruta.length === 0) {
+    console.error("❌ Ruta vacía o undefined");
+    return;
+  }
+
+  let pasoActual = 0;
   let energiaActual = universoDatos.cargaInicial;
 
+  // Actualizar UI inicial
   document.getElementById("energia-nave").textContent = energiaActual;
+  console.log(`⚡ Energía inicial: ${energiaActual}`);
 
-  const intervalo = setInterval(() => {
-    if (i >= ruta.length) {
-      console.log("Simulación completada");
-      clearInterval(intervalo);
-      log("✅ Animación completada!");
-      return;
-    }
-
-    // Redibuja el universo
+  // Función para dibujar un frame de la animación
+  function dibujarFrame() {
+    // Limpiar y redibujar el universo base
     dibujarMatriz(matrizEnergia, universoDatos);
 
-    // Dibujar ruta recorrida
-    if (i > 0) {
-      ctx.strokeStyle = "#00ff00";
-      ctx.lineWidth = 3;
-      ctx.setLineDash([5, 5]);
-      
-      for (let j = 0; j < i; j++) {
-        const [x1, y1] = ruta[j];
-        const [x2, y2] = ruta[j + 1] || ruta[j];
-        
-        if (j < i - 1) {
-          const centroX1 = x1 * tamCelda + tamCelda / 2;
-          const centroY1 = y1 * tamCelda + tamCelda / 2;
-          const centroX2 = x2 * tamCelda + tamCelda / 2;
-          const centroY2 = y2 * tamCelda + tamCelda / 2;
-          
-          ctx.beginPath();
-          ctx.moveTo(centroX1, centroY1);
-          ctx.lineTo(centroX2, centroY2);
-          ctx.stroke();
-        }
-      }
-      ctx.setLineDash([]);
+    // Dibujar el camino recorrido hasta ahora
+    if (pasoActual > 0) {
+      dibujarCaminoRecorrido(ruta, pasoActual);
     }
 
-    const [x, y] = ruta[i];
-    console.log(`Nave en posición: (${x}, ${y})`);
+    // Dibujar la nave en la posición actual
+    const [x, y] = ruta[pasoActual];
+    dibujarNaveAnimada(x, y, pasoActual);
 
-    // Calcular energía
-    if (i > 0) {
-      const gastoBase = matrizEnergia[y][x];
-      const gastoExtra = energiaExtra(x, y);
-      const gastoTotal = gastoBase + gastoExtra;
-      energiaActual -= gastoTotal;
+    console.log(`📍 Paso ${pasoActual + 1}/${ruta.length}: Nave en (${x}, ${y})`);
+  }
 
-      // Aplicar recarga si está disponible
-      const multiplicadorRecarga = obtenerRecarga(x, y);
-      if (multiplicadorRecarga > 1) {
-        energiaActual = Math.floor(energiaActual * multiplicadorRecarga);
-        log(`⚡ Energía recargada en (${x},${y}): x${multiplicadorRecarga}`);
-      }
+  // Función para avanzar al siguiente paso
+  function siguientePaso() {
+    if (pasoActual >= ruta.length - 1) {
+      console.log("✅ Simulación completada");
+      log("🎯 ¡Nave llegó al destino!");
+      return; // Terminar animación
     }
 
+    pasoActual++;
+    const [x, y] = ruta[pasoActual];
+
+    // Calcular gasto de energía (solo después del primer paso)
+    const gastoBase = matrizEnergia[y][x];
+    const gastoExtra = energiaExtra(x, y);
+    const gastoTotal = gastoBase + gastoExtra;
+    energiaActual -= gastoTotal;
+
+    console.log(`💰 Gasto en (${x},${y}): ${gastoTotal} (base: ${gastoBase}, extra: ${gastoExtra})`);
+
+    // Aplicar recarga si está disponible
+    const multiplicadorRecarga = obtenerRecarga(x, y);
+    if (multiplicadorRecarga > 1) {
+      const energiaAnterior = energiaActual;
+      energiaActual = Math.floor(energiaActual * multiplicadorRecarga);
+      console.log(`⚡ Recarga aplicada: ${energiaAnterior} → ${energiaActual} (x${multiplicadorRecarga})`);
+      log(`⚡ Energía recargada en (${x},${y}): x${multiplicadorRecarga}`);
+    }
+
+    // Actualizar UI
     document.getElementById("energia-nave").textContent = energiaActual;
 
-    // Dibujar la nave con animación
-    dibujarNaveAnimada(x, y, i);
+    // Dibujar frame actual
+    dibujarFrame();
 
-    i++;
-  }, 800); // Más lento para mejor visualización
+    // Programar siguiente paso
+    setTimeout(siguientePaso, 1000); // 1 segundo entre pasos
+  }
+
+  // Iniciar animación
+  dibujarFrame(); // Dibujar posición inicial
+  setTimeout(siguientePaso, 1000); // Comenzar movimiento después de 1 segundo
 }
 
 /**
- * Dibuja la nave con efecto de animación
+ * Dibuja el camino 
+ */
+function dibujarCaminoRecorrido(ruta, pasoActual) {
+  if (pasoActual < 1) return;
+
+  ctx.save(); // Guardar estado del contexto
+  
+  // Configurar línea del camino
+  ctx.strokeStyle = "#00ff00";
+  ctx.lineWidth = 4;
+  ctx.setLineDash([8, 4]);
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+
+  // Dibujar líneas conectando los puntos
+  for (let i = 0; i < pasoActual; i++) {
+    const [x1, y1] = ruta[i];
+    const [x2, y2] = ruta[i + 1];
+    
+    const centroX1 = x1 * tamCelda + tamCelda / 2;
+    const centroY1 = y1 * tamCelda + tamCelda / 2;
+    const centroX2 = x2 * tamCelda + tamCelda / 2;
+    const centroY2 = y2 * tamCelda + tamCelda / 2;
+    
+    ctx.beginPath();
+    ctx.moveTo(centroX1, centroY1);
+    ctx.lineTo(centroX2, centroY2);
+    ctx.stroke();
+  }
+
+  // Marcar puntos visitados
+  ctx.fillStyle = "#00ff0080"; // Verde semitransparente
+  for (let i = 0; i < pasoActual; i++) {
+    const [x, y] = ruta[i];
+    const centroX = x * tamCelda + tamCelda / 2;
+    const centroY = y * tamCelda + tamCelda / 2;
+    
+    ctx.beginPath();
+    ctx.arc(centroX, centroY, 6, 0, 2 * Math.PI);
+    ctx.fill();
+  }
+
+  ctx.restore(); // Restaurar estado del contexto
+}
+
+/**
+ * Dibuja la nave con efecto de animación 
  */
 function dibujarNaveAnimada(x, y, paso) {
   const centroX = x * tamCelda + tamCelda / 2;
   const centroY = y * tamCelda + tamCelda / 2;
 
-  // Efecto de brillo
-  ctx.shadowColor = "#00ffff";
-  ctx.shadowBlur = 10;
+  ctx.save(); // Guardar estado del contexto
+
+  // Efecto de brillo pulsante
+  const tiempo = Date.now() / 500;
+  const brillo = 5 + Math.sin(tiempo) * 3;
   
-  // Nave principal
-  ctx.font = `${tamCelda - 2}px Arial`;
+  ctx.shadowColor = "#00ffff";
+  ctx.shadowBlur = brillo;
+  
+  // Nave principal más grande
+  ctx.font = `${tamCelda + 4}px Arial`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText("🚀", centroX, centroY);
   
-  // Resetear sombra
+  // Resetear sombra para el número
   ctx.shadowBlur = 0;
+  ctx.shadowColor = "transparent";
 
-  // Mostrar número de paso
+  // Mostrar número de paso con fondo
+  ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+  ctx.beginPath();
+  ctx.arc(centroX + tamCelda/3, centroY - tamCelda/3, 8, 0, 2 * Math.PI);
+  ctx.fill();
+
   ctx.fillStyle = "#ffffff";
   ctx.font = `${tamCelda - 18}px Arial`;
-  ctx.fillText((paso + 1).toString(), centroX, centroY + tamCelda - 8);
+  ctx.fillText((paso + 1).toString(), centroX + tamCelda/3, centroY - tamCelda/3);
+
+  ctx.restore(); // Restaurar estado del contexto
 }
 
 /**
@@ -206,12 +278,12 @@ function detectarTipoCelda(x, y, universo) {
   // Verificar en orden de prioridad
   if (universo.origen[0] === y && universo.origen[1] === x) return "origen";
   if (universo.destino[0] === y && universo.destino[1] === x) return "destino";
+  if (match(universo.zonasRecarga)) return "recarga";
+  if (match(universo.celdasCargaRequerida, "coordenada")) return "cargaExtra";
   if (match(universo.agujerosNegros)) return "agujeroNegro";
   if (match(universo.estrellasGigantes)) return "estrella";
   if (match(universo.portales, "desde")) return "portal";
   if (match(universo.agujerosGusano, "entrada")) return "gusano";
-  if (match(universo.zonasRecarga)) return "recarga";
-  if (match(universo.celdasCargaRequerida, "coordenada")) return "cargaExtra";
   
   return "normal";
 }
@@ -222,7 +294,7 @@ function detectarTipoCelda(x, y, universo) {
 function obtenerColorFondo(tipo, valor) {
   switch (tipo) {
     case "agujeroNegro":
-      return "#000000";
+      return "#1a1a1a";
     case "estrella":
       return "#fff3cd";
     case "portal":
@@ -262,6 +334,8 @@ function dibujarCohete(x, y) {
 
 // Funciones auxiliares para el backtracking
 function energiaExtra(x, y) {
+  if (!universoDatos || !universoDatos.celdasCargaRequerida) return 0;
+  
   const celda = universoDatos.celdasCargaRequerida.find(
     (c) => c.coordenada[0] === y && c.coordenada[1] === x
   );
@@ -269,6 +343,8 @@ function energiaExtra(x, y) {
 }
 
 function obtenerRecarga(x, y) {
+  if (!universoDatos || !universoDatos.zonasRecarga) return 1;
+  
   const zona = universoDatos.zonasRecarga.find(
     ([zy, zx, multiplicador]) => zy === y && zx === x
   );

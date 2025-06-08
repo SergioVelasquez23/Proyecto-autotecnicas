@@ -2,28 +2,51 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', sans-serif;
-  background-color: #0d0d1a;
+  background: linear-gradient(to top, #1e202c, #fd746c, #ffb88c);
   color: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Estrellas animadas */
+body::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: transparent url('../asteroide.png') repeat;
+  animation: twinkling 60s linear infinite;
+  z-index: 0;
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+@keyframes twinkling {
+  0% { background-position: 0 0; }
+  100% { background-position: -10000px 5000px; }
 }
 
 header {
-  margin-top: 20px;
+  margin-top: 30px;
   text-align: center;
+  z-index: 1;
 }
 
 h1 {
-  color: #58a6ff;
-  font-size: 2.5rem;
-  margin-bottom: 0.3rem;
+  color: #fffaf0;
+  font-size: 2.8rem;
+  margin-bottom: 0.4rem;
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.5);
 }
 
 p {
-  color: #ccc;
+  color: #f5f5f5;
   font-size: 1rem;
+  z-index: 1;
 }
 
 .controles {
@@ -32,77 +55,89 @@ p {
   gap: 12px;
   justify-content: center;
   margin: 20px 0;
+  z-index: 1;
 }
 
 .controles input[type="file"],
 .controles button {
-  background-color: #1f1f2e;
-  color: #fff;
+  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+  color: #333;
   border: none;
-  padding: 10px 16px;
-  border-radius: 10px;
+  padding: 10px 18px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  font-size: 0.95rem;
+  transition: all 0.25s ease-in-out;
+  font-size: 1rem;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
 }
 
 .controles button:hover {
-  background-color: #2c2c45;
-  transform: scale(1.05);
+  background: linear-gradient(135deg, #fcb69f, #ffecd2);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
 }
 
 #estado-nave {
   margin-top: 10px;
   font-weight: bold;
   color: #2ecc71;
+  z-index: 1;
 }
 
 .matriz-container {
-  background: radial-gradient(circle at center, #1a1a2e, #000);
-  padding: 15px;
-  border-radius: 12px;
-  box-shadow: 0 0 25px rgba(0, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.15);
+  z-index: 1;
+  backdrop-filter: blur(4px);
 }
 
 canvas {
-  border-radius: 10px;
+  border-radius: 12px;
   image-rendering: pixelated;
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
-  background-color: #090909;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.2);
+  background-color: rgba(0, 0, 0, 0.6);
 }
 
 #mensajes {
-  margin: 25px auto;
+  margin: 30px auto;
   width: 90%;
   max-width: 800px;
-  background-color: #141424;
-  padding: 15px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(88, 166, 255, 0.2);
+  background-color: rgba(20, 20, 36, 0.85);
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(255, 183, 128, 0.25);
+  z-index: 1;
+  backdrop-filter: blur(3px);
 }
 
 #mensajes p {
-  margin: 0 0 8px;
-  color: #58a6ff;
+  margin: 0 0 10px;
+  color: #ffddc1;
 }
 
 #log {
-  font-size: 0.9rem;
-  color: #eee;
+  font-size: 0.92rem;
+  color: #f5f5f5;
   max-height: 150px;
   overflow-y: auto;
 }
 
 footer {
-  margin: 20px 0;
-  font-size: 0.85rem;
+  margin: 25px 0;
+  font-size: 0.9rem;
+  color: #eee;
+  z-index: 1;
 }
 
 footer a {
-  color: #aaa;
+  color: #ffd;
   text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 footer a:hover {
+  color: #fffacd;
   text-decoration: underline;
 }
