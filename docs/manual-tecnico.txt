@@ -1,0 +1,558 @@
+# Manual Técnico - Universo Algoritmos
+
+## Tabla de Contenidos
+1. [Arquitectura del Sistema](#arquitectura-del-sistema)
+2. [Módulo 1: Implementación Técnica](#módulo-1-implementación-técnica)
+3. [Módulo 2: Implementación Técnica](#módulo-2-implementación-técnica)
+4. [Estructuras de Datos](#estructuras-de-datos)
+5. [Algoritmos Implementados](#algoritmos-implementados)
+6. [API y Funciones](#api-y-funciones)
+7. [Optimizaciones](#optimizaciones)
+8. [Testing y Debugging](#testing-y-debugging)
+9. [Extensibilidad](#extensibilidad)
+
+---
+
+## Arquitectura del Sistema
+
+### Visión General
+El sistema **Universo Algoritmos** está implementado como una aplicación web cliente-servidor usando JavaScript vanilla, HTML5 y CSS3. La arquitectura sigue el patrón **Modelo-Vista-Controlador (MVC)** distribuido en módulos independientes.
+
+### Estructura de Directorios
+```
+Proyecto-autotecnicas/
+├── index.html                     # Página principal del sistema
+├── style.css                      # Estilos globales
+├── modulo1-mision-interestelar/    # Módulo de backtracking
+│   ├── index.html                 # Interfaz del módulo 1
+│   ├── style.css                  # Estilos específicos
+│   ├── universo.js                # Carga y manejo de datos
+│   ├── backtracking.js            # Algoritmo de búsqueda
+│   └── renderer.js                # Visualización gráfica
+├── modulo2-sintaxis-galactica/     # Módulo de AFD
+│   ├── index.html                 # Interfaz del módulo 2
+│   ├── style.css                  # Estilos específicos
+│   ├── afd.js                     # Autómatas finitos
+│   └── validator.js               # Lógica de validación
+├── data/                          # Archivos de datos
+│   └── universo.json              # Configuración del universo
+├── docs/                          # Documentación
+└── assets/                        # Recursos multimedia
+```
+
+### Tecnologías Utilizadas
+- **Frontend**: HTML5, CSS3, JavaScript ES6+
+- **Algoritmos**: Backtracking, Autómatas Finitos Deterministas
+- **Visualización**: Canvas API, CSS Grid, Flexbox
+- **Manejo de Archivos**: File API, FileReader API
+- **Control de Versiones**: Git, GitHub
+
+---
+
+## Módulo 1: Implementación Técnica
+
+### Arquitectura del Módulo 1
+
+#### Componentes Principales
+1. **universo.js**: Manejo de datos y configuración del universo
+2. **backtracking.js**: Implementación del algoritmo de búsqueda
+3. **renderer.js**: Visualización y renderizado gráfico
+4. **index.html**: Interfaz de usuario del módulo
+
+### Algoritmo de Backtracking
+
+#### Implementación Central
+```javascript
+function buscarRutaOptima(inicioX, inicioY, destinoX, destinoY, energiaInicial) {
+    const visitados = new Set();
+    const rutaActual = [];
+    let mejorRuta = null;
+    let menorCosto = Infinity;
+    
+    function backtrack(x, y, energiaRestante, costoAcumulado) {
+        // Caso base: llegamos al destino
+        if (x === destinoX && y === destinoY) {
+            if (costoAcumulado < menorCosto) {
+                menorCosto = costoAcumulado;
+                mejorRuta = [...rutaActual, [x, y]];
+            }
+            return;
+        }
+        
+        // Explorar movimientos válidos (arriba, derecha, abajo, izquierda)
+        const movimientos = [[0, 1], [1, 0], [0, -1], [-1, 0]];
+        
+        for (const [dx, dy] of movimientos) {
+            const nuevoX = x + dx;
+            const nuevoY = y + dy;
+            const clave = `${nuevoX},${nuevoY}`;
+            
+            if (esMovimientoValido(nuevoX, nuevoY, energiaRestante, visitados)) {
+                const costoMovimiento = obtenerCostoCelda(nuevoX, nuevoY);
+                
+                visitados.add(clave);
+                rutaActual.push([x, y]);
+                
+                backtrack(
+                    nuevoX, 
+                    nuevoY, 
+                    energiaRestante - costoMovimiento,
+                    costoAcumulado + costoMovimiento
+                );
+                
+                // Backtrack: deshacer el movimiento
+                rutaActual.pop();
+                visitados.delete(clave);
+            }
+        }
+    }
+    
+    backtrack(inicioX, inicioY, energiaInicial, 0);
+    return mejorRuta;
+}
+```
+
+#### Optimizaciones Implementadas
+
+##### 1. Poda por Energía
+```javascript
+function esMovimientoValido(x, y, energiaRestante, visitados) {
+    // Verificar límites del universo
+    if (x < 0 || x >= ANCHO_UNIVERSO || y < 0 || y >= ALTO_UNIVERSO) {
+        return false;
+    }
+    
+    // Verificar si ya fue visitado
+    if (visitados.has(`${x},${y}`)) {
+        return false;
+    }
+    
+    // Verificar obstáculos
+    if (esObstaculo(x, y)) {
+        return false;
+    }
+    
+    // Poda por energía: verificar si hay suficiente energía
+    const costoMovimiento = obtenerCostoCelda(x, y);
+    const distanciaMinima = calcularDistanciaManhattan(x, y, destinoX, destinoY);
+    
+    if (energiaRestante < costoMovimiento + distanciaMinima) {
+        return false; // Poda: no hay suficiente energía para llegar
+    }
+    
+    return true;
+}
+```
+
+##### 2. Heurística de Distancia Manhattan
+```javascript
+function calcularDistanciaManhattan(x1, y1, x2, y2) {
+    return Math.abs(x2 - x1) + Math.abs(y2 - y1);
+}
+```
+
+### Sistema de Visualización
+
+#### Renderizado del Canvas
+```javascript
+class UniversoRenderer {
+    constructor(canvasId, ancho, alto) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.ancho = ancho;
+        this.alto = alto;
+        this.tamañoCelda = Math.min(
+            this.canvas.width / ancho, 
+            this.canvas.height / alto
+        );
+    }
+    
+    renderizarUniverso() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        for (let y = 0; y < this.alto; y++) {
+            for (let x = 0; x < this.ancho; x++) {
+                this.renderizarCelda(x, y);
+            }
+        }
+        
+        this.renderizarPuntosEspeciales();
+        this.renderizarRuta();
+    }
+    
+    renderizarCelda(x, y) {
+        const costo = matrizEnergia[y][x];
+        const color = this.obtenerColorPorCosto(costo);
+        
+        this.ctx.fillStyle = color;
+        this.ctx.fillRect(
+            x * this.tamañoCelda, 
+            y * this.tamañoCelda, 
+            this.tamañoCelda, 
+            this.tamañoCelda
+        );
+        
+        // Dibujar borde
+        this.ctx.strokeStyle = '#333';
+        this.ctx.strokeRect(
+            x * this.tamañoCelda, 
+            y * this.tamañoCelda, 
+            this.tamañoCelda, 
+            this.tamañoCelda
+        );
+    }
+    
+    obtenerColorPorCosto(costo) {
+        if (costo === Infinity) return '#000000'; // Obstáculo
+        if (costo <= 3) return '#4CAF50';         // Verde (bajo costo)
+        if (costo <= 6) return '#FFC107';         // Amarillo (costo medio)
+        return '#F44336';                         // Rojo (alto costo)
+    }
+}
+```
+
+---
+
+## Módulo 2: Implementación Técnica
+
+### Arquitectura del Módulo 2
+
+#### Componentes Principales
+1. **afd.js**: Implementación de autómatas finitos deterministas
+2. **validator.js**: Lógica de validación y clasificación de tipos
+3. **index.html**: Interfaz de usuario del módulo
+
+### Autómatas Finitos Deterministas
+
+#### Implementación del AFD para Tarjetas de Crédito
+```javascript
+// Matriz de transiciones para tarjetas de crédito
+// Estados: 0-31 representan diferentes fases de la validación
+const matrizTarjeta = [
+    { "\\d": 1 },                    // Estado 0: Esperar primer dígito
+    { "\\d": 2 },                    // Estado 1: Segundo dígito grupo 1
+    { "\\d": 3 },                    // Estado 2: Tercer dígito grupo 1
+    { "\\d": 4, " ": 5 },           // Estado 3: Cuarto dígito o espacio
+    { " ": 5 },                      // Estado 4: Esperar espacio
+    { "\\d": 6 },                    // Estado 5: Primer dígito grupo 2
+    // ... continúa para todos los estados hasta el 31
+];
+
+function validarTarjetaCredito(cadena) {
+    let estado = 0;
+    
+    // Verificación previa de errores semánticos
+    const errorSemantico = verificarErroresSemanticos(cadena);
+    if (errorSemantico) {
+        return errorSemantico;
+    }
+    
+    // Procesamiento carácter por carácter
+    for (let i = 0; i < cadena.length; i++) {
+        const caracter = cadena[i];
+        const transiciones = matrizTarjeta[estado];
+        
+        const siguienteEstado = Object.keys(transiciones).find(patron =>
+            new RegExp(patron).test(caracter)
+        );
+        
+        if (siguienteEstado) {
+            estado = transiciones[siguienteEstado];
+        } else {
+            return generarErrorEspecifico(caracter, estado, i);
+        }
+    }
+    
+    // Verificar estado final
+    return estado === 31 ? 
+        { valido: true } : 
+        { valido: false, error: "Formato incompleto", errorPosicion: cadena.length };
+}
+```
+
+#### Validaciones Semánticas Avanzadas
+```javascript
+function verificarErroresSemanticos(cadena) {
+    if (cadena.length >= 30) {
+        const partes = cadena.split(" ");
+        
+        if (partes.length >= 5) {
+            const fecha = partes[4];
+            
+            if (fecha && fecha.includes("/")) {
+                const [mes, anio] = fecha.split("/").map(Number);
+                
+                // Validar mes (01-12)
+                if (!isNaN(mes) && (mes < 1 || mes > 12)) {
+                    return {
+                        valido: false,
+                        error: "Mes inválido (debe estar entre 01 y 12)",
+                        errorPosicion: cadena.indexOf(fecha)
+                    };
+                }
+                
+                // Validar año (actual + 10 años máximo)
+                const anioActual = new Date().getFullYear();
+                if (!isNaN(anio) && (anio < anioActual || anio > anioActual + 10)) {
+                    return {
+                        valido: false,
+                        error: `Año inválido (debe estar entre ${anioActual} y ${anioActual + 10})`,
+                        errorPosicion: cadena.indexOf(fecha) + 3
+                    };
+                }
+            }
+        }
+        
+        // Validar CVV (exactamente 3 dígitos)
+        if (partes.length >= 6) {
+            const cvv = partes[5];
+            if (cvv && cvv.length !== 3) {
+                const mensaje = cvv.length < 3 ? 
+                    "CVV debe tener 3 dígitos" : 
+                    "CVV no puede tener más de 3 dígitos";
+                
+                return {
+                    valido: false,
+                    error: mensaje,
+                    errorPosicion: cadena.indexOf(cvv)
+                };
+            }
+        }
+    }
+    
+    return null; // No hay errores semánticos
+}
+```
+
+#### AFD para Direcciones IPv4
+```javascript
+function validarIPv4(cadena) {
+    let estado = 0;
+    const octetos = [];
+    let octetoActual = "";
+    
+    for (let i = 0; i < cadena.length; i++) {
+        const caracter = cadena[i];
+        
+        if (/\d/.test(caracter)) {
+            octetoActual += caracter;
+            
+            // Validar que el octeto no exceda 255
+            if (parseInt(octetoActual) > 255) {
+                return {
+                    valido: false,
+                    error: `Octeto ${octetos.length + 1} está fuera de rango (máximo 255)`,
+                    errorPosicion: i - octetoActual.length + 1
+                };
+            }
+            
+            // Validar ceros a la izquierda
+            if (octetoActual.length > 1 && octetoActual[0] === '0') {
+                return {
+                    valido: false,
+                    error: "No se permiten ceros a la izquierda en octetos",
+                    errorPosicion: i - octetoActual.length + 1
+                };
+            }
+            
+        } else if (caracter === '.') {
+            if (octetoActual === "") {
+                return {
+                    valido: false,
+                    error: "Octeto vacío antes del punto",
+                    errorPosicion: i
+                };
+            }
+            
+            octetos.push(parseInt(octetoActual));
+            octetoActual = "";
+            
+            if (octetos.length > 3) {
+                return {
+                    valido: false,
+                    error: "Demasiados octetos (máximo 4)",
+                    errorPosicion: i
+                };
+            }
+            
+        } else {
+            return {
+                valido: false,
+                error: `Carácter inválido '${caracter}' en IPv4`,
+                errorPosicion: i
+            };
+        }
+    }
+    
+    // Validar formato final
+    if (octetoActual !== "") {
+        octetos.push(parseInt(octetoActual));
+    }
+    
+    if (octetos.length !== 4) {
+        return {
+            valido: false,
+            error: `IPv4 incompleta (${octetos.length}/4 octetos)`,
+            errorPosicion: cadena.length
+        };
+    }
+    
+    return { valido: true };
+}
+```
+
+### Sistema de Clasificación Inteligente
+
+#### Algoritmo de Detección de Tipos
+```javascript
+function identificarYValidar(linea, index) {
+    const resultadoTarjeta = validarTarjetaCredito(linea);
+    const resultadoIPv4 = validarIPv4(linea);
+    
+    // Si alguno es válido, retornar inmediatamente
+    if (resultadoTarjeta.valido) {
+        return {
+            valido: true,
+            mensaje: `Línea ${index + 1}: Tarjeta válida`,
+            original: linea,
+            tipo: "Tarjeta de Crédito"
+        };
+    }
+    
+    if (resultadoIPv4.valido) {
+        return {
+            valido: true,
+            mensaje: `Línea ${index + 1}: IPv4 válida`,
+            original: linea,
+            tipo: "Dirección IPv4"
+        };
+    }
+    
+    // Clasificación inteligente para errores
+    const tipoDetectado = clasificarTipoAutomaticamente(linea);
+    const errorInfo = tipoDetectado === "Dirección IPv4" ? 
+        resultadoIPv4 : resultadoTarjeta;
+    
+    return {
+        valido: false,
+        mensaje: `Línea ${index + 1}: ${tipoDetectado} inválida`,
+        original: linea,
+        tipo: tipoDetectado,
+        error: errorInfo.error,
+        errorPosicion: errorInfo.errorPosicion
+    };
+}
+
+function clasificarTipoAutomaticamente(linea) {
+    // Heurísticas de clasificación
+    const tienePuntos = /\./.test(linea);
+    const tieneEspacios = / /.test(linea);
+    const tieneBarra = /\//.test(linea);
+    const soloNumerosYPuntos = /^[\d.]+$/.test(linea);
+    
+    // Priorizar IPv4 si tiene puntos y no espacios/barras
+    if (tienePuntos && !tieneEspacios && !tieneBarra && soloNumerosYPuntos) {
+        return "Dirección IPv4";
+    }
+    
+    // Priorizar tarjeta si tiene espacios o barras
+    if (tieneEspacios || tieneBarra) {
+        return "Tarjeta de Crédito";
+    }
+    
+    // Clasificación por longitud y contenido
+    if (linea.length <= 15 && tienePuntos) {
+        return "Dirección IPv4";
+    }
+    
+    return "Tarjeta de Crédito";
+}
+```
+
+---
+
+## Extensibilidad
+
+### Agregando Nuevos Tipos de Validación
+
+#### 1. Crear nuevo AFD
+```javascript
+// Ejemplo: AFD para validar emails
+const matrizEmail = [
+    { "[a-zA-Z0-9]": 1 },           // Estado 0: Primer carácter
+    { "[a-zA-Z0-9.]": 1, "@": 2 },  // Estado 1: Parte local
+    { "[a-zA-Z]": 3 },              // Estado 2: Primer carácter dominio
+    { "[a-zA-Z0-9.]": 3 }           // Estado 3: Resto del dominio
+];
+
+function validarEmail(cadena) {
+    // Implementación similar a tarjetas e IPv4
+}
+```
+
+#### 2. Extender el clasificador
+```javascript
+function clasificarTipoAutomaticamente(linea) {
+    // Agregar nueva heurística
+    if (linea.includes("@") && linea.includes(".")) {
+        return "Email";
+    }
+    
+    // Mantener heurísticas existentes
+    // ...
+}
+```
+
+### Mejoras Futuras
+
+#### 1. Algoritmos de Búsqueda Alternativos
+- **A***: Para búsquedas más eficientes
+- **Dijkstra**: Para rutas con pesos dinámicos
+- **Búsqueda en anchura**: Para rutas mínimas en pasos
+
+#### 2. Tipos de Datos Adicionales
+- **Números de teléfono**
+- **Códigos postales**
+- **URLs**
+- **Fechas en diferentes formatos**
+
+#### 3. Optimizaciones de Rendimiento
+- **Web Workers**: Para procesamiento en paralelo
+- **IndexedDB**: Para caché de resultados
+- **Service Workers**: Para funcionalidad offline
+
+---
+
+## Consideraciones de Seguridad
+
+### Validación de Entrada
+```javascript
+function sanitizarEntrada(texto) {
+    // Eliminar caracteres peligrosos
+    return texto.replace(/[<>\"'&]/g, '');
+}
+
+function validarTamañoArchivo(archivo) {
+    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+    return archivo.size <= MAX_SIZE;
+}
+```
+
+### Manejo de Errores
+```javascript
+function manejarErrorSeguro(error, contexto) {
+    // Log del error sin exponer información sensible
+    console.error(`Error en ${contexto}:`, error.message);
+    
+    // Retornar mensaje genérico al usuario
+    return "Ha ocurrido un error inesperado. Por favor, intente nuevamente.";
+}
+```
+
+---
+
+## Conclusión
+
+El sistema **Universo Algoritmos** demuestra la implementación práctica de algoritmos fundamentales de ciencias de la computación. La arquitectura modular permite fácil mantenimiento y extensibilidad, mientras que las optimizaciones implementadas aseguran un rendimiento aceptable para los casos de uso previstos.
+
+La combinación de backtracking para búsqueda de rutas y autómatas finitos para análisis léxico proporciona una base sólida para futuras expansiones del sistema.
