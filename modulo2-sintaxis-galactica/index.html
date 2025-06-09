@@ -68,9 +68,9 @@
                     invalidResultsDiv.innerHTML = results.invalidas.map(result =>
                         `<div class="result-item invalid">
                             <strong>✗ ${result.original}</strong><br>
-                            <span class="result-type">${result.tipo}</span><br>
+                            <span class="result-type">${result.tipo}</span>
                             <span class="error-message">Error: ${result.error}</span>
-                            ${result.errorPosicion !== undefined ? `<br><span class="error-position">Posición del error: ${result.errorPosicion}</span>` : ''}
+                            ${result.errorPosicion !== undefined ? `<span class="error-position">Posición del error: ${result.errorPosicion}</span>` : ''}
                         </div>`
                     ).join('');
                 } else {
